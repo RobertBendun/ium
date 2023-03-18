@@ -1,9 +1,10 @@
+# Remove all columns according to specification in columns.pruned.tsv
 languages.pruned.tsv: languages.original.tsv columns.user.tsv
 	bash -c "cut -f`grep '^y' columns.user.tsv | cut -f2 | paste -sd ','` $< >$@"
 
 # Allow user to mark in which columns is interested
 columns.user.tsv: columns.pruned.tsv
-	if [ -f $@ ]; then touch $@; else awk 'NR==1{ printf("Keep\t"); print } NR>1{printf("n\t"); print}' $< >$@; fi
+	if [ -f $@ ]; then touch $@; else awk 'NR==1{ printf("Keep\tType\t"); print } NR>1{printf("n\tstr\t"); print}' $< >$@; fi
 
 # Prune columns that are not needed to create specification
 columns.pruned.tsv: columns.original.tsv

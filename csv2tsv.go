@@ -12,7 +12,8 @@ func main() {
 	reader.FieldsPerRecord = -1
 	reader.ReuseRecord = true
 
-	loop: for lineno := 0;; lineno++ {
+loop:
+	for lineno := 0; ; lineno++ {
 		record, err := reader.Read()
 		switch err {
 		case io.EOF:
