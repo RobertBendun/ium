@@ -1,10 +1,6 @@
-# # Prune poorly filled or uninteresting columns
-# languages.pruned1.tsv: languages.original.tsv
-# 	cut --complement -f1,16-18,22,23,39,40,50,52,53,58-61,64-68,70-75,79,82,84-86,100,103-104,107-109,112,114,116-118,121-136,142,149,150,157,162,163,163,164,165,176,177,185,186,195, $< >$@
-
 # Allow user to mark in which columns is interested
 columns.user.tsv: columns.pruned.tsv
-	awk 'NR==1{ printf("Keep\t"); print } NR>1{printf("n\t"); print}' $< >$@
+	if [ -f $@ ]; then touch $@; else awk 'NR==1{ printf("Keep\t"); print } NR>1{printf("n\t"); print}' $< >$@; fi
 
 # Prune columns that are not needed to create specification
 columns.pruned.tsv: columns.original.tsv
@@ -23,3 +19,8 @@ columns.original.csv:
 
 languages.original.csv: columns.original.csv
 	wget 'https://pldb.com/languages.csv' -O $@
+
+clean:
+	rm -f languages.*.tsv languages.*.csv columns.original.tsv columns.*.csv columns.pruned.tsv
+
+.PHONY: clean
