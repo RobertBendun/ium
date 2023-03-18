@@ -1,3 +1,6 @@
 [submodule "aitech-ium"]
 	path = aitech-ium
 	url = https://git.wmi.amu.edu.pl/AITech/aitech-ium.git
+[submodule "tsv2json/json"]
+	path = tsv2json/json
+	url = https://github.com/RobertBendun/ImmidiateJSON.git

@@ -3,3 +3,6 @@ columns.pruned.tsv
 columns.original.tsv
 *.csv
 csv2tsv/csv2tsv
+.cache
+compile_commands.json
+tsv2json/tsv2json

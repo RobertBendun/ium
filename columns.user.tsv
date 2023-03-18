@@ -2,7 +2,7 @@ Keep	Type	Index	Column	Description
 y	lower	1	title	The official title of the language
 y	int	2	appeared	What year was the language publicly released and/or announced?
 y	lower	3	type	Which category in PLDB's subjective ontology does this entity fit into.
-y	int	4	pldbId	computed
+y	lower	4	pldbId	computed
 y	int	5	rank	computed
 y	int	6	languageRank	computed
 y	int	7	factCount	computed
@@ -13,12 +13,12 @@ y	int	11	paperCount	computed
 y	int	12	numberOfUsers	computed
 y	int	13	numberOfJobs	computed
 y	int	14	githubBigQuery.repos	How many repos for this language are listed in Google's BigQuery Public GitHub Dataset snapshot.
-y	lower(sep("\band\b"))	15	creators	Name(s) of the original creators of the language delimited by " and "
+y	sep(" and ").lower	15	creators	Name(s) of the original creators of the language delimited by " and "
 y	bool	16	githubRepo	URL of the official GitHub repo for the project if it hosted there.
 y	bool	17	website	URL of the official homepage for the language project.
 y	bool	18	wikipedia	URL of the entity on Wikipedia, if and only if it has a page dedicated to it.
-y	lower(sep("\b&&\b"))	19	originCommunity	In what community(ies) did the language first originate?
-y	lower(skip("various",sep("\band\b")))	20	country	What country was the language first developed in?
+y	sep(" && ").lower	19	originCommunity	In what community(ies) did the language first originate?
+y	unless("various").lower.sep(" and ")	20	country	What country was the language first developed in?
 n	Type	21	centralPackageRepositoryCount	If you've searched for a CPM for this language and can't find one, set 0 as the count.
 n	Type	22	reference	A link to more info about this entity. You can add raw links and then auto "upgrade" them using some of the importer code.
 n	Type	23	hopl	The matching language on Diarmuid Pigott's Online Historical Encyclopaedia of Programming Languages site (https://hopl.info/)
@@ -85,9 +85,9 @@ y	bool	83	features.hasMultiLineComments
 n	Type	84	rijuRepl	A link to try this language on riju.codes
 n	Type	85	githubLanguage.codemirror_mime_type	A String name of the file mime type used for highlighting whenever a file is edited. This should match the `mime` associated with the mode from https://git.io/f4SoQ
 n	Type	86	githubLanguage.codemirror_mode	A String name of the CodeMirror Mode used for highlighting whenever a file is edited. This must match a mode from https://git.io/vi9Fx
-y	sep(' ')	87	fileExtensions	An Array of associated extensions (the first one is considered the primary extension, the others should be listed alphabetically).
+y	sep(" ")	87	fileExtensions	An Array of associated extensions (the first one is considered the primary extension, the others should be listed alphabetically).
 n	Type	88	tiobe	Tiobe maintains a well known ranking of programming languages here: https://www.tiobe.com/tiobe-index/
-y	sep(' ')	89	related	What languages are related? This serves as a catch all, and it is better to use a more specific relationship node such as "supersetOf".
+y	sep(" ")	89	related	What languages are related? This serves as a catch all, and it is better to use a more specific relationship node such as "supersetOf".
 y	str	90	multiLineCommentTokens	A comment with a start delimiter and end token (which can be the same) that can span multiple lines.
 n	Type	91	aka	Another name for the language. Entries can have multiple aka lines.
 y	bool	92	features.hasIntegers
@@ -95,7 +95,7 @@ n	Type	93	helloWorldCollection	Hello world written in this language from http://
 n	Type	94	githubLanguage.aliases	An Array of additional aliases (implicitly includes name.downcase).
 y	bool	95	features.hasFloats
 n	Type	96	tryItOnline	A link to try this language on https://tio.run
-y	sep(' ')	97	writtenIn	What language(s) is the main implementation written in?
+y	sep(" ")	97	writtenIn	What language(s) is the main implementation written in?
 y	bool	98	features.hasBooleans
 n	Type	99	keywords	What are all the keywords in this language?
 n	Type	100	indeedJobs	How many job descriptions match this query for this language on indeed.com?
@@ -139,10 +139,10 @@ n	Type	137	tiobe.currentRank	What is the current Tiobe rank of this language?
 y	bool	138	features.hasWhileLoops
 n	Type	139	forLanguages	Which languages is this repository for?
 n	Type	140	packageCount	How many packages are in the repository? A package is some code with a name and a namespace, shipped as an atomic unit, with an owner(s).
-y	sep(' ')	141	supersetOf	Is this language a superset of another? If you specify this link then the superset language will inherit all features of subset language.
+y	sep(" ")	141	supersetOf	Is this language a superset of another? If you specify this link then the superset language will inherit all features of subset language.
 n	Type	142	indeedJobs.2017
 y	bool	143	features.hasBinaryNumbers
-y	sep(' ')	144	influencedBy	What languages influenced this one?
+y	sep(" ")	144	influencedBy	What languages influenced this one?
 y	bool	145	features.hasOperatorOverloading
 y	bool	146	features.hasImports
 y	bool	147	features.hasFunctions
@@ -198,7 +198,7 @@ n	Type	196	demoVideo	Provide a url of a demo video of the language.
 n	Type	197	isPublicDomain	Is it public domain?
 y	bool	198	features.hasMultilineStrings
 y	bool	199	features.hasVariableSubstitutionSyntax	Do you use different syntax when assigning versus referencing a variable?
-y	sep(' ')	200	subsetOf	Is this language a subset of another?
+y	sep(" ")	200	subsetOf	Is this language a subset of another?
 n	Type	201	firstAnnouncement	A url announcing the creation or release of a new language
 n	Type	202	packageInstallCount	How many packages have been downloaded?
 y	bool	203	features.canWriteToDisk
@@ -273,7 +273,7 @@ y	bool	271	features.hasDestructuring
 y	bool	272	features.hasGenerators
 y	bool	273	features.hasDynamicProperties
 y	bool	274	features.hasExpressions
-y	sep(' ')	275	forkOf	What language is this language a fork of?
+y	sep(" ")	275	forkOf	What language is this language a fork of?
 n	Type	276	inputLanguages	Which language(s) does this take as input? For compilers, what languages does this compile compile?
 n	Type	277	redditDiscussion	A link to a related discussion on reddit.
 y	bool	278	features.hasTryCatch
@@ -347,7 +347,7 @@ n	Type	345	ebook	Link to a free eBook about this. Only include if the eBook is o
 y	bool	346	features.hasExports
 y	bool	347	features.hasZippers
 y	bool	348	features.hasMonads
-y	sep(' ')	349	extensionOf	What language is this language an extension of?
+y	sep(" ")	349	extensionOf	What language is this language an extension of?
 n	Type	350	zulip	Link to official (or popular unofficial) Zulip for language development.
 y	bool	351	features.hasImplicitArguments
 y	bool	352	features.hasDynamicTyping
