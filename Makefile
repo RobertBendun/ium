@@ -1,6 +1,6 @@
 # Remove all columns according to specification in columns.pruned.tsv
 languages.pruned.tsv: languages.original.tsv columns.user.tsv
-	bash -c "cut -f`grep '^y' columns.user.tsv | cut -f2 | paste -sd ','` $< >$@"
+	bash -c "cut -f`grep '^y' columns.user.tsv | cut -f3 | paste -sd ','` $< >$@"
 
 # Allow user to mark in which columns is interested
 columns.user.tsv: columns.pruned.tsv
@@ -12,7 +12,7 @@ columns.pruned.tsv: columns.original.tsv
 
 # Change data to TSV format since it is easier to process using standard UNIX tools
 %.tsv: %.csv
-	go run ./csv2tsv.go <$< >$@
+	csv2tsv/csv2tsv <$< >$@
 
 # Check while downloading that file is as expected.
 # Otherwise automatic filter mechanism wouldn't work.
@@ -26,5 +26,8 @@ languages.original.csv: columns.original.csv
 
 clean:
 	rm -f languages.*.tsv languages.*.csv columns.original.tsv columns.*.csv columns.pruned.tsv
+
+csv2tsv/csv2tsv: csv2tsv/csv2tsv.go
+	cd csv2tsv; go build
 
 .PHONY: clean
