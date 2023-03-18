@@ -18,7 +18,7 @@ y	bool	16	githubRepo	URL of the official GitHub repo for the project if it hoste
 y	bool	17	website	URL of the official homepage for the language project.
 y	bool	18	wikipedia	URL of the entity on Wikipedia, if and only if it has a page dedicated to it.
 y	sep(" && ").lower	19	originCommunity	In what community(ies) did the language first originate?
-y	unless("various").lower.sep(" and ")	20	country	What country was the language first developed in?
+y	lower.unless("various").sep(" and ")	20	country	What country was the language first developed in?
 n	Type	21	centralPackageRepositoryCount	If you've searched for a CPM for this language and can't find one, set 0 as the count.
 n	Type	22	reference	A link to more info about this entity. You can add raw links and then auto "upgrade" them using some of the importer code.
 n	Type	23	hopl	The matching language on Diarmuid Pigott's Online Historical Encyclopaedia of Programming Languages site (https://hopl.info/)

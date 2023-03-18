@@ -31,6 +31,6 @@ csv2tsv/csv2tsv: csv2tsv/csv2tsv.go
 	cd csv2tsv; go build
 
 tsv2json/tsv2json: tsv2json/tsv2json.cc
-	g++ -std=c++20 -O3 -Wall -Wextra -o $@ $<
+	g++ -std=c++20 -O0 -Wall -Wextra -o $@ $< -ggdb
 
 .PHONY: clean

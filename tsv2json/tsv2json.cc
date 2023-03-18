@@ -90,7 +90,7 @@ struct Expression
 
 	Type type;
 	std::string_view symbol;
-	std::vector<Expression> sub;
+	std::vector<Expression> sub{};
 
 	Expression(std::string_view symbol)
 		: type{Type::Symbol}
@@ -104,9 +104,6 @@ struct Expression
 		, sub{std::move(arg)}
 	{
 	}
-
-	Expression(Expression const&) = default;
-	Expression(Expression &&) = default;
 
 	friend std::ostream& operator<<(std::ostream& os, Expression const& expr)
 	{
@@ -195,13 +192,29 @@ struct Value
 {
 	enum class Type
 	{
-		String,
+		Null,
+		Bool,
 		Number,
+		String,
+		Vector,
 	};
 
-	Type type;
-	std::string string;
-	double number;
+	Type type = Type::Null;
+	bool boolean = false;
+	std::string string{};
+	double number = 0;
+	std::vector<Value> vector{};
+
+	explicit Value()
+		: type(Type::Null)
+	{
+	}
+
+	explicit Value(bool b)
+		: type(Type::Bool)
+		, boolean(b)
+	{
+	}
 
 	explicit Value(std::string_view s)
 		: type(Type::String)
@@ -214,26 +227,67 @@ struct Value
 		, number(number)
 	{
 	}
+
+	explicit Value(std::vector<Value> vector)
+		: type(Type::Vector)
+		, vector(std::move(vector))
+	{
+	}
 };
 
-using Builtin = Value(*)(Value, std::optional<std::string_view>);
-using Env = std::unordered_map<std::string, Builtin>;
+Json& operator+=(Json& json, Value const& value)
+{
+	switch (value.type) {
+	break; case Value::Type::Null:   json = nullptr;
+	break; case Value::Type::Bool:   json = value.boolean;
+	break; case Value::Type::String: json = value.string;
+	break; case Value::Type::Number: json = value.number;
+	break; case Value::Type::Vector:
+		{
+			auto _array = json.array();
+			for (auto const& element : value.vector) json += element;
+		}
+	}
+	return json;
+}
 
-Value eval(std::span<Expression> expressions, Value value, Env const& env)
+struct Builtin
+{
+	std::string_view name;
+	Value(*handler)(Value, std::optional<std::string_view>);
+	bool accepts_vector = false;
+};
+
+using Env = std::vector<Builtin>;
+
+Value eval(std::vector<Expression> const& expressions, Value value, Env const& env)
 {
 	for (auto const& expr : expressions) {
-		auto builtin = env.find(std::string(expr.symbol));
+		auto builtin = std::find_if(env.begin(), env.end(), [expr](Builtin const& b) { return b.name == expr.symbol; });
 		if (builtin == env.end()) {
 			std::cerr << "[ERROR] Unknown builtin: " << expr.symbol << '\n';
 			std::exit(1);
 		}
-		switch (expr.type) {
-		break; case Expression::Symbol:
-			value = builtin->second(std::move(value), std::nullopt);
-		break; case Expression::Call:
-			assert(expr.sub.size() == 1);
-			assert(expr.sub.front().type == Expression::Symbol);
-			value = builtin->second(std::move(value), expr.sub[0].symbol);
+		if (!builtin->accepts_vector && value.type == Value::Type::Vector) {
+			for (auto &element : value.vector) {
+				switch (expr.type) {
+				break; case Expression::Symbol:
+					element = builtin->handler(std::move(element), std::nullopt);
+				break; case Expression::Call:
+					assert(expr.sub.size() == 1);
+					assert(expr.sub.front().type == Expression::Symbol);
+					element = builtin->handler(std::move(element), expr.sub[0].symbol);
+				}
+			}
+		} else {
+			switch (expr.type) {
+			break; case Expression::Symbol:
+				value = builtin->handler(std::move(value), std::nullopt);
+			break; case Expression::Call:
+				assert(expr.sub.size() == 1);
+				assert(expr.sub.front().type == Expression::Symbol);
+				value = builtin->handler(std::move(value), expr.sub[0].symbol);
+			}
 		}
 	}
 	return value;
@@ -244,13 +298,14 @@ struct Column
 	Column(std::string_view name, std::string_view normalization_expression)
 		: name(name)
 		, expression_source(normalization_expression)
-		, expression(parse_normalization_expression(normalization_expression))
+		, expression()
 	{
+		expression = parse_normalization_expression(normalization_expression);
 	}
 
 	inline Value normalize(std::string_view source, Env const& env)
 	{
-		return eval(std::span(expression), Value(source), env);
+		return eval(expression, Value(source), env);
 	}
 
 	std::string_view name;
@@ -277,18 +332,17 @@ int main(int argc, char** argv)
 
 	for (std::string_view line : split::iterator(source, '\n')) {
 		auto tsv_it = split::iterator(line, '\t');
-		if (tsv_it == split::sentinel{} || *tsv_it++ != "y") {
-			continue;
-		}
+		if (tsv_it == split::sentinel{} || !(*tsv_it++).starts_with("y")) { continue; }
+
 		auto const type = *tsv_it++; if (tsv_it == split::sentinel{}) continue;
 		[[maybe_unused]] auto const _column_number = *tsv_it++; if (tsv_it == split::sentinel{}) continue;
-		auto const name = *tsv_it++; if (tsv_it == split::sentinel{}) continue;
+		auto const name = *tsv_it++;
 
 		columns.emplace_back(name, type);
 	}
 
 	Env env = {
-		std::pair<std::string, Builtin> { "lower", +[](Value v, std::optional<std::string_view>) -> Value {
+		Builtin { "lower", +[](Value v, std::optional<std::string_view>) -> Value {
 			assert(v.type == Value::Type::String);
 			// FIXME Proper UTF-8 lowercase
 			// However, manual inspection of used TSV files prooved that there aren't any non-ascii uppercase letters
@@ -300,15 +354,63 @@ int main(int argc, char** argv)
 			return v;
 		}},
 
-		std::pair<std::string, Builtin> { "int", +[](Value v, std::optional<std::string_view>) -> Value {
+		Builtin { "int", +[](Value v, std::optional<std::string_view>) -> Value {
 			assert(v.type == Value::Type::String);
 
 			long long int n;
 			std::cout.flush();
+			if (v.string.empty()) {
+				return Value{};
+			}
 			auto [p, ec] = std::from_chars(v.string.data(), v.string.data() + v.string.size(), n);
-			assert(ec == std::errc{});
+			if (ec != std::errc{}) {
+				return Value{};
+			}
+
+
 			return Value(double(n));
 		}},
+
+		Builtin { "bool", +[](Value v, std::optional<std::string_view>) -> Value {
+			assert(v.type == Value::Type::String);
+			return Value(v.string.empty());
+		}},
+
+		Builtin { "str", +[](Value v, std::optional<std::string_view>) -> Value {
+			assert(v.type == Value::Type::String);
+			return v;
+		}},
+
+		Builtin { "sep", +[](Value v, std::optional<std::string_view> by) -> Value {
+			assert(by && "sep requires parameter by which it can split");
+			assert(v.type == Value::Type::String && "only string can be splitted");
+
+			std::vector<Value> separated;
+			std::string_view source = v.string;
+			for (;;) if (auto split_point = source.find(*by); split_point != std::string_view::npos) {
+				separated.emplace_back(source.substr(0, split_point));
+				source.remove_prefix(split_point + by->size());
+			} else {
+				break;
+			}
+
+			if (source.size()) {
+				separated.emplace_back(source);
+			}
+			return Value(std::move(separated));
+		}},
+
+		Builtin {
+			.name = "unless",
+			.handler = +[](Value v, std::optional<std::string_view> needle) -> Value {
+				assert(v.type == Value::Type::String);
+				assert(needle && "Unless requires string to search for");
+				if (v.string.find(*needle) == std::string::npos)
+					return v;
+				return Value("");
+			},
+			.accepts_vector = false
+		}
 	};
 
 
@@ -316,19 +418,16 @@ int main(int argc, char** argv)
 		bool passed_header = false;
 		Json json;
 		auto _array = json.array();
-		for (std::string line; std::getline(std::cin, line); ) {
+		for (std::string line; std::getline(std::cin, line);) {
 			if (!passed_header) {
 				passed_header = true;
 				continue;
 			}
 			auto _object = json.object();
 			auto tsv = split::iterator(line, '\t');
-			for (auto i = 0u; tsv != split::sentinel{}; ++i, ++tsv) {
-				auto normalized = columns[i].normalize(*tsv, env);
-				switch (normalized.type) {
-				break; case Value::Type::String: json.key(columns[i].name) = normalized.string;
-				break; case Value::Type::Number: json.key(columns[i].name) = double(normalized.number);
-				}
+			for (auto column = 0u; tsv != split::sentinel{}; ++column, ++tsv) {
+				assert(column < columns.size());
+				json.key(columns[column].name) += columns[column].normalize(*tsv, env);
 			}
 			break;
 		}
