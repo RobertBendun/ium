@@ -29,4 +29,8 @@ for k in "${keep[@]}"; do
 	fi
 done
 
-./normalize <stop_times.tsv >stop_times.normalized.tsv
+if [ ! -f "stop_times.normalized.tsv" ]; then
+	./normalize <stop_times.tsv >stop_times.normalized.tsv
+	./split_train_valid_test.py
+fi
+./stats.py
