@@ -2,7 +2,10 @@ languages.*.tsv
 columns.pruned.tsv
 columns.original.tsv
 *.csv
+*.tsv
 csv2tsv/csv2tsv
 .cache
 compile_commands.json
 tsv2json/tsv2json
+normalize
+data

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-set -e -o pipefail
+set -xe -o pipefail
+
+make normalize csv2tsv/csv2tsv
 
 keep=(stops.txt trips.txt stop_times.txt)
 
@@ -19,5 +21,12 @@ done
 cd ..
 
 for k in "${keep[@]}"; do
-	cat $(find data -name "$k") > "$k"
+	csv="${k%.txt}.csv"
+	tsv="${k%.txt}.tsv"
+	if [ ! -f "$tsv" ]; then
+		cat $(find data -name "$k") > "$csv"
+		csv2tsv/csv2tsv <"$csv" >"$tsv"
+	fi
 done
+
+./normalize <stop_times.tsv >stop_times.normalized.tsv
