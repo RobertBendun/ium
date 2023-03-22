@@ -42,7 +42,6 @@ shgroup["departure_time"] = shgroup["departure_time"].map(float2time)
 print(shgroup)
 print()
 
-
 print("--- Normalized data statistics -------------------------------")
 print(data.describe(include='all'))
 
