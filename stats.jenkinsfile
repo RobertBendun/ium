@@ -1,7 +1,7 @@
 node {
     stage('Build') {
 			checkout([$class: 'GitSCM', branches: [[name: 'ztm']], extensions: [], userRemoteConfigs: [[url: 'https://git.wmi.amu.edu.pl/s452639/ium_452639']]])
-			copyArtifacts filter: 'train.csv', fingerprintArtifacts: true, projectName: 's452627-create-dataset', selector: buildParameter('BUILD_SELECTOR')
+			copyArtifacts filter: 'train.csv', fingerprintArtifacts: true, projectName: 's452639-create-dataset', selector: buildParameter('BUILD_SELECTOR')
 			sh './stats.sh'
     }
 }
