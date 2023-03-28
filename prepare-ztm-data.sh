@@ -5,7 +5,7 @@ set -xe -o pipefail
 # Disable to allow to work in bare jenkins
 # make normalize csv2tsv/csv2tsv
 
-keep=(stops.txt trips.txt stop_times.txt)
+keep=stop_times.txt
 
 mkdir -p data && cd data
 xargs -- wget --no-verbose --no-clobber <../ztm-data.txt
@@ -21,10 +21,14 @@ done
 
 cd ..
 
-for k in "${keep[@]}"; do
-	csv="${k%.txt}.csv"
-	cat $(find data -name "$k") > "$csv"
-done
+k=$keep
+csv="${k%.txt}.csv"
+cat $(find data -name "$k") | shuf > "$csv"
+train_size=$(( $(wc -l "$csv" | cut -f1 -d' ') * 8 / 10 ))
+echo $train_size
+
+head -n $train_size  $csv >train.csv
+tail -n +$train_size $csv >test.csv
 
 # Disable to allow to work in bare jenkins
 # for k in "${keep[@]}"; do
