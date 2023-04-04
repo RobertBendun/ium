@@ -7,8 +7,7 @@ node {
 		stage('Build') {
 			checkout([$class: 'GitSCM', branches: [[name: 'ztm']], extensions: [], userRemoteConfigs: [[url: 'https://git.wmi.amu.edu.pl/s452639/ium_452639']]])
 
-			copyArtifacts filter: 'src/stop_times.normalized.tsv,src/stop_times.train.tsv,src/stop_times.test.tsv,src/stop_times.valid.tsv',
-				fingerprintArtifacts: true,
+			copyArtifacts fingerprintArtifacts: true,
 				projectName: 's452639-create-dataset',
 				selector: buildParameter('BUILD_SELECTOR'),
 				target: 'src/'
@@ -16,7 +15,7 @@ node {
 			sh 'echo xd1; ls -l'
 			sh 'echo xd2; cd src; ls -l'
 			sh 'cd src; ./stats.py > stats.txt'
-			archiveArtifacts artifacts: 'stats.txt', followSymlinks: false
+			archiveArtifacts artifacts: 'src/stats.txt', followSymlinks: false
 		}
 	}
 }
