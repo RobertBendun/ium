@@ -10,7 +10,8 @@ node {
 			copyArtifacts filter: 'src/stop_times.train.tsv,src/stop_times.test.tsv,src/stop_times.valid.tsv',
 				fingerprintArtifacts: true,
 				projectName: 's452639-create-dataset',
-				selector: buildParameter('BUILD_SELECTOR')
+				selector: buildParameter('BUILD_SELECTOR'),
+				target: 'src/'
 
 			sh 'cd src; ./stats.py > stats.txt'
 			archiveArtifacts artifacts: 'stats.txt', followSymlinks: false
