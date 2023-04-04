@@ -40,6 +40,3 @@ fi
 if [ ! \( -f "stop_times.train.tsv" -a -f "stop_times.test.tsv" -a -f "stop_times.valid.tsv" \) ]; then
 	./split_train_valid_test.py
 fi
-
-
-./stats.py
