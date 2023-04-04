@@ -10,6 +10,7 @@ node {
 			copyArtifacts fingerprintArtifacts: true,
 				projectName: 's452639-create-dataset',
 				selector: buildParameter('BUILD_SELECTOR'),
+				flatten: true,
 				target: 'src/'
 
 			sh 'echo xd1; ls -l'
