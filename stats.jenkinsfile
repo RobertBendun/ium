@@ -1,10 +1,20 @@
 node {
-    stage('Build') {
-			checkout([$class: 'GitSCM', branches: [[name: 'ztm']], extensions: [], userRemoteConfigs: [[url: 'https://git.wmi.amu.edu.pl/s452639/ium_452639']]])
-			copyArtifacts filter: 'train.csv', fingerprintArtifacts: true, projectName: 's452639-create-dataset', selector: buildParameter('BUILD_SELECTOR')
-			sh './stats.sh > stats.txt'
-			archiveArtifacts artifacts: 'stats.txt', followSymlinks: false
-    }
-}
+	checkout scm
 
+	def local_image = docker.build("local-image")
+
+	local_image.inside {
+		stage('Build') {
+			checkout([$class: 'GitSCM', branches: [[name: 'ztm']], extensions: [], userRemoteConfigs: [[url: 'https://git.wmi.amu.edu.pl/s452639/ium_452639']]])
+
+			copyArtifacts filter: 'src/stop_times.train.tsv,src/stop_times.test.tsv,src/stop_times.valid.tsv',
+				fingerprintArtifacts: true,
+				projectName: 's452639-create-dataset',
+				selector: buildParameter('BUILD_SELECTOR')
+
+			sh 'cd src; ./stats.py > stats.txt'
+			archiveArtifacts artifacts: 'stats.txt', followSymlinks: false
+		}
+	}
+}
 
