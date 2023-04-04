@@ -9,7 +9,7 @@ node {
 			sh 'cd src; ./prepare-ztm-data.sh'
 
 			archiveArtifacts
-				artifacts: 'src/stop_times.normalized.tsv'src/stop_times.train.tsv,src/stop_times.test.tsv,src/stop_times.valid.tsv',
+				artifacts: 'src/stop_times.normalized.tsv,src/stop_times.train.tsv,src/stop_times.test.tsv,src/stop_times.valid.tsv',
 				followSymlinks: false
 		}
 	}
