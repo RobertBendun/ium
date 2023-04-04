@@ -2,6 +2,10 @@
 
 set -xe -o pipefail
 
+# Go requires presence of this variable with some sensible directory
+export XDG_CACHE_HOME="/tmp/xdg_cache_home/"
+mkdir -p "$XDG_CACHE_HOME"
+
 make normalize csv2tsv/csv2tsv
 
 keep=stop_times.txt
