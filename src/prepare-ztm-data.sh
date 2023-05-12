@@ -41,5 +41,5 @@ if [ ! \( -f "stop_times.train.tsv" -a -f "stop_times.test.tsv" -a -f "stop_time
 	./split_train_valid_test.py
 fi
 
-cut -f3 stop_times.normalized.tsv | head -n1 > stop_times.categories.tsv
-cut -f3 stop_times.normalized.tsv | tail -n +2 | uniq | sort | uniq >> stop_times.categories.tsv
+head -n 1 stop_times.normalized.tsv | cut -f3- > stop_times.categories.tsv
+tail -n +2 stop_times.normalized.tsv | cut -f3- | uniq | sort | uniq >> stop_times.categories.tsv
