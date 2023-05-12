@@ -3,4 +3,4 @@
 set -xe
 
 docker build -t ium .
-docker run -it ium
+docker run -v .:/ium/ -it ium

@@ -22,20 +22,22 @@ def load_data(path: str, le: LabelEncoder):
 
 num_classes = len(le.classes_)
 
-model = tf.keras.Sequential([
-    tf.keras.layers.Input(shape=(2,)),
-    tf.keras.layers.Dense(4 * num_classes, activation='relu'),
-    tf.keras.layers.Dense(4 * num_classes, activation='relu'),
-    tf.keras.layers.Dense(4 * num_classes, activation='relu'),
-    tf.keras.layers.Dense(num_classes, activation='softmax')
-])
-
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-              metrics=['accuracy'])
 
 def train():
-    global model, le
+    global le
+
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(2,)),
+        tf.keras.layers.Dense(4 * num_classes, activation='relu'),
+        tf.keras.layers.Dense(4 * num_classes, activation='relu'),
+        tf.keras.layers.Dense(4 * num_classes, activation='relu'),
+        tf.keras.layers.Dense(num_classes, activation='softmax')
+    ])
+
+    model.compile(optimizer='adam',
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                  metrics=['accuracy'])
+
     train_x, train_y, _ = load_data('./stop_times.train.tsv', le)
     train_x = tf.convert_to_tensor(train_x, dtype=tf.float32)
     train_y = tf.convert_to_tensor(train_y)
@@ -50,22 +52,7 @@ def train():
     with open('history', 'w') as f:
         print(repr(history), file=f)
 
-    model.save_weights('model.ckpt')
+    model.save('model.keras')
 
-def test():
-    global model, le
-    test_x, test_y, _ = load_data('./stop_times.test.tsv', le)
-    test_x = tf.convert_to_tensor(test_x, dtype=tf.float32)
-    test_y = tf.convert_to_tensor(test_y)
-    model.load_weights('model.ckpt')
-    model.evaluate(test_x, test_y)
-
-SUBCOMMANDS = {
-    "test": test,
-    "train": train,
-}
-
-import sys
-assert len(sys.argv) == 2
-assert sys.argv[1] in SUBCOMMANDS.keys()
-SUBCOMMANDS[sys.argv[1]]()
+if __name__ == "__main__":
+    train()
