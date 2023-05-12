@@ -1,7 +1,7 @@
 node {
 	checkout scm
 
-	def local_image = docker.build("local-image")
+	def local_image = docker.build("s452639-image")
 
 	local_image.inside {
 		stage('Build') {

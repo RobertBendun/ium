@@ -13,10 +13,8 @@ node {
 				flatten: true,
 				target: 'src/'
 
-			sh 'echo xd1; ls -l'
-			sh 'echo xd2; cd src; ls -l'
-			sh 'cd src; ./stats.py > stats.txt'
-			archiveArtifacts artifacts: 'src/stats.txt', followSymlinks: false
+			sh 'cd src; python tf_train.py'
+			archiveArtifacts artifacts: 'src/model.keras', followSymlinks: false
 		}
 	}
 }
