@@ -6,7 +6,7 @@ node {
 	local_image.inside {
 		stage('Prepare artifacts') {
 			try {
-				copyArtifacts(projectName: currentBuild.projectName,
+				copyArtifacts projectName: currentBuild.projectName,
 					selector: specific("${currentBuild.previousBuild.number}"),
 					flatten: true,
 					target: 'src/'
