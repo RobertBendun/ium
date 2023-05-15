@@ -7,7 +7,7 @@ node {
 		stage('Prepare artifacts') {
 			try {
 				copyArtifacts(projectName: currentBuild.projectName,
-					selector: specific("${currentBuild.previousBuild.number}")),
+					selector: specific("${currentBuild.previousBuild.number}"),
 					flatten: true,
 					target: 'src/'
 
