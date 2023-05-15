@@ -1,0 +1,8 @@
+name: ium
+channels:
+  - defaults
+dependencies:
+  - pandas
+  - tensorflow
+  - scikit-learn
+  - matplotlib
