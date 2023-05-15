@@ -23,7 +23,7 @@ def load_data(path: str, le: LabelEncoder):
 num_classes = len(le.classes_)
 
 
-def train():
+def train(epochs: int):
     global le
 
     model = tf.keras.Sequential([
@@ -46,13 +46,10 @@ def train():
     valid_x = tf.convert_to_tensor(valid_x, dtype=tf.float32)
     valid_y = tf.convert_to_tensor(valid_y)
 
-    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath='checkpoint.ckpt', save_weights_only=True)
-    history = model.fit(train_x, train_y, validation_data=(valid_x, valid_y), epochs=2, batch_size=1024, callbacks=[model_checkpoint_callback])
-
-    with open('history', 'w') as f:
-        print(repr(history), file=f)
-
+    model.fit(train_x, train_y, validation_data=(valid_x, valid_y), epochs=epochs, batch_size=1024)
     model.save('model.keras')
 
 if __name__ == "__main__":
-    train()
+    import sys
+    epochs = int('2' if len(sys.argv) != 2 else sys.argv[1])
+    train(epochs)

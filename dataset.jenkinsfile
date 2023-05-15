@@ -1,6 +1,8 @@
 node {
 	checkout scm
 
+	stage('Configuration')
+
 	def local_image = docker.build("s452639-image")
 
 	local_image.inside {
@@ -11,10 +13,10 @@ node {
 			archiveArtifacts artifacts: 'src/stop_times.normalized.tsv,src/stop_times.train.tsv,src/stop_times.test.tsv,src/stop_times.valid.tsv,src/stop_times.categories.tsv',
 				followSymlinks: false
 		}
+	}
 
-		stage('Trigger') {
-			build wait: false, job: 's452639-training'
-		}
+	stage('Trigger') {
+		build wait: false, job: 's452639-training'
 	}
 }
 

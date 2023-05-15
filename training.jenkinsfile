@@ -1,6 +1,25 @@
 node {
 	checkout scm
 
+	stage('Init') {
+		properties([
+			pipelineTriggers([ upstream(threshold: hudson.model.Result.SUCCESS, upstreamProjects: 's452639-create-dataset' ) ]),
+			parameters([
+				buildSelector(
+					defaultSelector: lastSuccessful(),
+					description: "Source of dataset",
+					name: 'BUILD_SELECTOR'
+				),
+				string(
+					defaultValue: "2",
+					description: "Epochs count",
+					name: "EPOCHS",
+					trim: true
+				),
+			])
+		])
+	}
+
 	def local_image = docker.build("s452639-image")
 
 	local_image.inside {
@@ -13,9 +32,13 @@ node {
 				flatten: true,
 				target: 'src/'
 
-			sh 'cd src; python tf_train.py'
+			sh 'cd src; python tf_train.py $EPOCHS'
 			archiveArtifacts artifacts: 'src/model.keras', followSymlinks: false
 		}
+	}
+
+	stage('Trigger') {
+		build wait: false, job: 's452639-evaluation.eg'
 	}
 }
 

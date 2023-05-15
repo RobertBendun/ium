@@ -1,0 +1,39 @@
+node {
+	checkout scm
+
+	def local_image = docker.build("s452639-image")
+
+	local_image.inside {
+		stage('Prepare artifacts') {
+			try {
+				copyArtifacts(projectName: currentBuild.projectName,
+					selector: specific("${currentBuild.previousBuild.number}")),
+					flatten: true,
+					target: 'src/'
+
+			} catch (err) {
+				echo("with new accuracy log")
+			}
+		}
+
+		stage('Evaluate') {
+			checkout([$class: 'GitSCM', branches: [[name: 'ztm']], extensions: [], userRemoteConfigs: [[url: 'https://git.wmi.amu.edu.pl/s452639/ium_452639']]])
+
+			copyArtifacts fingerprintArtifacts: true,
+				projectName: 's452639-create-dataset',
+				selector: lastSuccessful(),
+				flatten: true,
+				target: 'src/'
+
+			copyArtifacts fingerprintArtifacts: true,
+				projectName: 's452639-training',
+				selector: lastSuccessful(),
+				flatten: true,
+				target: 'src/'
+
+			sh 'cd src; python tf_test.py'
+			archiveArtifacts artifacts: 'src/stop_times.predictions.tsv,src/stop_times.accuracy.tsv'
+		}
+	}
+}
+
