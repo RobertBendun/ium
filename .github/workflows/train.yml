@@ -1,6 +1,6 @@
 name: train-model
 on:
-  workflow-dispatch:
+  workflow_dispatch:
     inputs:
       epochs:
         description: 'Number of epochs for training'
