@@ -45,7 +45,7 @@ jobs:
 
 
   ensure-model-size:
-    name: "Test"
+    name: "Ensure model size"
     runs-on: ubuntu-latest
     needs: train
     steps:
