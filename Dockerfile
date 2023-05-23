@@ -10,6 +10,7 @@ WORKDIR /ium/src/
 
 RUN wget https://bendun.students.wmi.amu.edu.pl/stop_times.train.tsv
 RUN wget https://bendun.students.wmi.amu.edu.pl/stop_times.valid.tsv
+RUN wget https://bendun.students.wmi.amu.edu.pl/stop_times.test.tsv
 RUN wget https://bendun.students.wmi.amu.edu.pl/stop_times.categories.tsv
 
 VOLUME /github/workspace/
