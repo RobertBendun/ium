@@ -4,7 +4,7 @@ RUN apt update && apt install -y vim make python3 python3-pip python-is-python3 
 RUN pip install pandas matplotlib scikit-learn tensorflow
 
 RUN mkdir /ium
-COPY . /ium
+COPY .. /ium
 
 WORKDIR /ium/src/
 
