@@ -15,7 +15,7 @@ jobs:
 
       - name: Use Docker action
         id: train
-        uses: ./train-action/
+        uses: ./
         with:
           epochs: 1
 
