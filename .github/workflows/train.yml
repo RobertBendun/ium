@@ -20,7 +20,7 @@ jobs:
           epochs: 1
 
       - name: Archive
-        uses: action/upload-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
           name: model
           path: model.keras
