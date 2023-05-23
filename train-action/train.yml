@@ -7,6 +7,6 @@ inputs:
     default: '2'
 runs:
   using: 'docker'
-  image: 'train.dockerfile'
+  image: 'Dockerfile'
   args:
     - ${{ inputs.epochs }}

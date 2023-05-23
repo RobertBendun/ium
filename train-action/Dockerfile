@@ -14,4 +14,4 @@ RUN wget https://bendun.students.wmi.amu.edu.pl/stop_times.categories.tsv
 
 VOLUME /github/workspace/
 
-ENTRYPOINT ["/ium/train-entrypoint.sh"]
+ENTRYPOINT ["/ium/train-action/entrypoint.sh"]
