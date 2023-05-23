@@ -51,5 +51,8 @@ def train(epochs: int):
 
 if __name__ == "__main__":
     import sys
-    epochs = int('2' if len(sys.argv) != 2 else sys.argv[1])
+    try:
+        epochs = int('2' if len(sys.argv) != 2 else sys.argv[1])
+    except ValueError:
+        epochs = 2
     train(epochs)
