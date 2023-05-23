@@ -1,0 +1,12 @@
+name: Train
+description: 'Train model'
+inputs:
+  epochs:
+    description: 'Number of epochs'
+    required: true
+    default: '2'
+runs:
+  using: 'docker'
+  image: 'train.dockerfile'
+  args:
+    - ${{ inputs.epochs }}

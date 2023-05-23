@@ -1,0 +1,27 @@
+name: train-model
+on:
+  workflow-dispatch:
+    inputs:
+      epochs:
+        description: 'Number of epochs for training'
+        required: true
+        default: '1'
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Use Docker action
+        id: train
+        uses: ./
+        with:
+          epochs: 1
+
+      - name: Archive
+        uses: action/upload-artifact@v3
+        with:
+          name: model
+          path: model.keras
+
